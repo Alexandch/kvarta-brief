@@ -1,7 +1,7 @@
 module.exports = {
   ci: {
     collect: {
-      url: ["http://127.0.0.1:3000/"],
+      url: [process.env.LHCI_URL || "http://127.0.0.1:3000/"],
       startServerCommand: "npm run start -- --hostname 127.0.0.1",
       startServerReadyPattern: "Ready in",
       numberOfRuns: 3,
@@ -12,7 +12,7 @@ module.exports = {
     },
     upload: {
       target: "filesystem",
-      outputDir: "./artifacts/lighthouse",
+      outputDir: process.env.LHCI_OUTPUT_DIR || "./artifacts/lighthouse",
     },
   },
 };

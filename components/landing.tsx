@@ -134,7 +134,7 @@ export default function Landing() {
         </div>
       </div>
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="Кварта — на главную">
+        <a className="brand" href="#top" aria-label="Кварта, кофейная мастерская — на главную">
           <span className="brand-mark" aria-hidden="true">к<span>•</span></span>
           <span className="brand-word">кварта<small>КОФЕЙНАЯ МАСТЕРСКАЯ</small></span>
         </a>
@@ -243,7 +243,13 @@ export default function Landing() {
           {phoneError ? <span id="phone-error" className="field-error">{phoneError}</span> : <span id="phone-hint" className="field-hint">Белорусский мобильный номер</span>}
           <label htmlFor="interest">Что вас заинтересовало?</label>
           <select id="interest" name="interest" value={interest} onChange={(event) => setInterest(event.target.value)}>
-            <option>Подписка на кофе</option><option>Разовый заказ</option><option>Эфиопия Иргачеффе</option><option>Колумбия Уила</option><option>Бразилия Серрадо</option><option>Пока присматриваюсь</option>
+            <option value="Подписка на кофе">Подписка на кофе</option>
+            <option value="Разовый заказ">Разовый заказ</option>
+            <option value="Вопрос по кофе">Вопрос по кофе</option>
+            <option value="Иргачеффе">Эфиопия Иргачеффе</option>
+            <option value="Уила">Колумбия Уила</option>
+            <option value="Серрадо">Бразилия Серрадо</option>
+            <option value="Пока присматриваюсь">Пока присматриваюсь</option>
           </select>
           <label htmlFor="comment">Можно добавить пару слов</label>
           <textarea id="comment" name="comment" placeholder="Например, как вы завариваете кофе" value={comment} onChange={(event) => setComment(event.target.value)} rows={2} maxLength={500} />

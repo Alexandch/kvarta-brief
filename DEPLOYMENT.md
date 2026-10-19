@@ -67,6 +67,8 @@ Netlify автоматически подставляет предложенны
 6. Следующий push в `main` запустит workflow `.github/workflows/ci.yml`: сначала unit и integration tests, typecheck, production build и Lighthouse, затем deploy job опубликует production через Netlify CLI, только если проверки прошли. До добавления обоих GitHub Secrets тесты будут выполняться, а deploy будет пропускаться.
 7. После успешной публикации откройте production URL и отправьте тестовую заявку. Проверьте её в Supabase **Table Editor → public.leads**, затем удалите тестовую строку. Используйте отдельный тестовый номер и никогда не запускайте интеграционные проверки против production базы.
 
+8. Если на публичной странице видна плашка **Powered by Netlify**, отключите её: **Project configuration → General → Powered by Netlify badge → off → Save**. Настройка применяется к следующим запросам без нового deploy. Плашка добавляется самим Netlify и может перекрывать содержимое на мобильном.
+
 Site ID и Personal access token нужны Netlify CLI для адресной публикации в нужный проект; см. [Get started with Netlify CLI](https://docs.netlify.com/api-and-cli-guides/cli-guides/get-started-with-cli/). Настроенная защита `main` должна требовать статус **Tests, build, and mobile Lighthouse**.
 
 ## Тесты и CI/CD
@@ -77,4 +79,12 @@ Workflow `.github/workflows/ci.yml` запускается на Pull Request и 
 
 ## Lighthouse mobile
 
-CI выполняет три замера Lighthouse мобильного профиля на собранной production-странице. HTML и JSON сохраняются как artifact `lighthouse-mobile-<commit>` в GitHub Actions run на 30 дней. [Отчёт первого успешного мобильного замера](https://github.com/Alexandch/kvarta-brief/actions/runs/39269644634) доступен внизу страницы запуска, в разделе **Artifacts**. В дальнейшем откройте **Actions → Verify and deploy → последний запуск → Artifacts**, чтобы скачать свежие отчёты. Scores зависят от runner, сети и загрузки внешних изображений; отчёт содержит и score, и подробности проверок. Локально Lighthouse запускается после `npm run build` командой `npm run lighthouse`, отчёты сохраняются в `artifacts/lighthouse/`.
+CI выполняет три замера Lighthouse мобильного профиля на production-сборке и сохраняет HTML/JSON как artifact `lighthouse-mobile-<commit>` в GitHub Actions run на 30 дней. Для повторного замера опубликованного сайта можно задать адрес и каталог отчёта перед той же командой:
+
+```powershell
+$env:LHCI_URL = "https://kvarta-brief.netlify.app/"
+$env:LHCI_OUTPUT_DIR = "reports/lighthouse-production"
+npm run lighthouse
+```
+
+В этой конфигурации мобильный профиль задан в `lighthouserc.cjs`; локальный URL по умолчанию — `http://127.0.0.1:3000/`. Scores могут немного меняться из-за сети, внешних изображений и условий runner; HTML-отчёт содержит метрики и причины замечаний.

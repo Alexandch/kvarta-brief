@@ -57,6 +57,8 @@ test("landing page renders the product section and lead form", async () => {
   assert.equal((html.match(/class="coffee-card/g) ?? []).length, 3);
   assert.match(html, /name="phone"/);
   assert.match(html, /name="interest"/);
+  assert.match(html, /<option value="Вопрос по кофе">Вопрос по кофе<\/option>/);
+  assert.match(html, /<option value="Уила">Колумбия Уила<\/option>/);
 });
 
 test("lead records are protected by row-level security", async () => {
