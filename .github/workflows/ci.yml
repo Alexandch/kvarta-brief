@@ -29,12 +29,12 @@ jobs:
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/kvarta_test?sslmode=disable
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm install --no-audit --no-fund
       - run: npm run test:unit
       - run: npm run typecheck
       - run: npm run build
@@ -43,7 +43,7 @@ jobs:
         run: npm run lighthouse
       - name: Keep Lighthouse HTML and JSON reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: lighthouse-mobile-${{ github.sha }}
           path: artifacts/lighthouse/
@@ -62,9 +62,9 @@ jobs:
       - name: Explain skipped deployment until Netlify is connected
         if: env.NETLIFY_AUTH_TOKEN == '' || env.NETLIFY_SITE_ID == ''
         run: echo "Verification passed. Configure NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID repository secrets to enable automatic production deploys."
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         if: env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
         with:
           node-version: 22
