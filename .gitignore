@@ -6,6 +6,7 @@ node_modules/
 .tools/
 reports/lighthouse-production/
 reports/lighthouse-postdeploy/
+reports/kvarta-production-mobile.png
 out/
 *.log
 *.tsbuildinfo

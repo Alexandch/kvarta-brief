@@ -26,4 +26,5 @@ PostgreSQL выбран вместо JSON-файла для надёжной з�
 ## Материалы для отправки
 
 - Приложить [мобильный Lighthouse-отчёт по production](reports/lighthouse-mobile-production.html).
+- На 19.10.2026 три mobile-прогона дали Performance 85/92/98 (медиана 92); Accessibility, Best Practices и SEO — по 100.
 - Приложить настоящий экспорт диалога с ИИ или скриншоты ключевых этапов. Использовался Codex; выдуманный экспорт Claude Code не добавлялся.
