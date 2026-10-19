@@ -19,7 +19,7 @@
 docker compose up -d --build
 ```
 
-Откройте `http://localhost:3000`. Compose собирает образ Next.js, ждёт готовности PostgreSQL и запускает сайт и базу. Контейнеры используют `restart: unless-stopped`, поэтому после перезагрузки компьютера приложение поднимется снова, когда запустится Docker Desktop. Чтобы остановить приложение, выполните `docker compose down`; данные базы останутся в Docker volume.
+Откройте `http://localhost:3000`. Compose собирает образ Next.js, ждёт готовности PostgreSQL и запускает сайт и базу. Контейнеры используют `restart: unless-stopped`, поэтому после перезагрузки компьютера приложение поднимется снова, когда запустится Docker Desktop. Чтобы не запускать сам Docker Desktop вручную, включите **Settings → General → Start Docker Desktop when you sign in**. Чтобы остановить приложение, выполните `docker compose down`; данные базы останутся в Docker volume.
 
 Если меняли код, обновите образ командой `docker compose up -d --build`. Локальные заявки можно просмотреть в таблице `leads` контейнера PostgreSQL. Для полного сброса локальной базы вместе с заявками используйте `docker compose down -v`.
 
