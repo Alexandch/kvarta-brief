@@ -4,9 +4,7 @@ node_modules/
 .lighthouseci/
 .data/
 .tools/
-reports/lighthouse-production/
-reports/lighthouse-postdeploy/
-reports/kvarta-production-mobile.png
+reports/
 out/
 *.log
 *.tsbuildinfo

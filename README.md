@@ -25,6 +25,10 @@ PostgreSQL выбран вместо JSON-файла для надёжной з�
 
 ## Материалы для отправки
 
-- Приложить [мобильный Lighthouse-отчёт по production](reports/lighthouse-mobile-production.html).
-- На 19.10.2026 три mobile-прогона дали Performance 85/92/98 (медиана 92); Accessibility, Best Practices и SEO — по 100.
+- Последний мобильный Lighthouse-прогон CI выполнен 19.10.2026 в 17:05:48 UTC: Performance — 97, Accessibility, Best Practices и SEO — по 100. Это один из трёх прогонов мобильной эмуляции.
+
+![Скриншот последнего мобильного Lighthouse-отчёта](docs/assets/lighthouse-mobile-latest.png)
+
+Полные HTML и JSON отчёты доступны в [артефактах GitHub Actions](https://github.com/Alexandch/kvarta-brief/actions/runs/39290887683) в течение 30 дней; в репозитории оставлен только скриншот последнего прогона.
+
 - Приложить настоящий экспорт диалога с ИИ или скриншоты ключевых этапов. Использовался Codex; выдуманный экспорт Claude Code не добавлялся.
