@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.netlify/
+.data/
+.tools/
+out/
+*.log
+.env*
+!.env.example
