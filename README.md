@@ -73,6 +73,6 @@ npm run dev
 - Принимаются только белорусские мобильные номера `+375 25`, `29`, `33` и `44`.
 
 
-## Supabase, CI/CD, and Lighthouse
+## Supabase, CI/CD и Lighthouse
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the step-by-step Supabase and Netlify setup, test pipeline, and mobile Lighthouse report instructions.
+Пошаговая настройка Supabase и Netlify, тестовый pipeline и инструкция к мобильному Lighthouse-отчёту описаны в [DEPLOYMENT.md](DEPLOYMENT.md).
