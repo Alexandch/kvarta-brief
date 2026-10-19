@@ -59,6 +59,11 @@ test("landing page renders the product section and lead form", async () => {
   assert.match(html, /name="interest"/);
 });
 
+test("lead records are protected by row-level security", async () => {
+  const result = await db.query("SELECT relrowsecurity FROM pg_class WHERE oid = 'public.leads'::regclass");
+  assert.equal(result.rows[0]?.relrowsecurity, true);
+});
+
 test("API rejects an invalid phone without creating a lead", async () => {
   const response = await submit({ name: "Тест", phone: "+375 17 123-45-67", interest: "Эспрессо" });
   assert.equal(response.status, 422);

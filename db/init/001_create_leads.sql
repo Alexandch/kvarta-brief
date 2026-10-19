@@ -9,6 +9,21 @@ CREATE TABLE IF NOT EXISTS public.leads (
   attribution jsonb NOT NULL DEFAULT '{}'::jsonb
 );
 
+-- Lead records contain personal data; do not expose them through the public Data API.
+ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
+
+-- Supabase creates these API roles; keep the script compatible with plain local PostgreSQL too.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+    REVOKE ALL PRIVILEGES ON TABLE public.leads FROM anon;
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+    REVOKE ALL PRIVILEGES ON TABLE public.leads FROM authenticated;
+  END IF;
+END;
+$$;
+
 CREATE INDEX IF NOT EXISTS leads_phone_recent_idx
   ON public.leads (phone_digits, created_at DESC);
 
@@ -45,5 +60,19 @@ BEGIN
   RETURNING inserted_lead.id, inserted_lead.created_at INTO new_lead_id, new_created_at;
 
   RETURN QUERY SELECT new_lead_id, new_created_at, false;
+END;
+$$;
+
+-- Only the trusted server connection (the table/function owner) should call this function.
+REVOKE EXECUTE ON FUNCTION public.create_kvarta_lead(text, text, text, text, text, jsonb) FROM PUBLIC;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+    REVOKE EXECUTE ON FUNCTION public.create_kvarta_lead(text, text, text, text, text, jsonb) FROM anon;
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+    REVOKE EXECUTE ON FUNCTION public.create_kvarta_lead(text, text, text, text, text, jsonb) FROM authenticated;
+  END IF;
 END;
 $$;
