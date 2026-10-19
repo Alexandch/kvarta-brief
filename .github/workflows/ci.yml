@@ -34,7 +34,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - run: npm run test:unit
       - run: npm run typecheck
       - run: npm run build
@@ -68,6 +68,10 @@ jobs:
         if: env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
         with:
           node-version: 22
+          cache: npm
+      - name: Install project dependencies
+        if: env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
+        run: npm ci --no-audit --no-fund
       - name: Build and deploy to Netlify production
         if: env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
-        run: npx --yes netlify-cli deploy --build --prod --auth "$NETLIFY_AUTH_TOKEN" --site "$NETLIFY_SITE_ID"
+        run: npx --yes netlify-cli deploy --prod --auth "$NETLIFY_AUTH_TOKEN" --site "$NETLIFY_SITE_ID"
