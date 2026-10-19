@@ -22,17 +22,52 @@
 
 ## Netlify
 
-1. Создайте сайт в Netlify и возьмите **Site ID** из настроек сайта.
-2. В **Project configuration → Environment variables** задайте `DATABASE_URL` со строкой Supabase. Укажите production context и scopes **Functions** и **Builds**. Netlify Functions получают переменные из панели Netlify; значения из `netlify.toml` туда не передаются.
-3. В **Build & deploy → Continuous deployment** отключите автоматическую публикацию commit из Git. Репозиторий остаётся на GitHub, но production publish выполняет workflow только после проверок.
-4. Создайте Netlify **Personal access token** для GitHub Actions.
-5. В GitHub откройте **Settings → Secrets and variables → Actions** и добавьте:
-   - `NETLIFY_AUTH_TOKEN` — Netlify personal access token;
-   - `NETLIFY_SITE_ID` — Site ID сайта.
-6. Проверьте, что Actions разрешены в **Settings → Actions → General**. Настроенная защита `main` должна требовать статус **Tests, build, and mobile Lighthouse**.
-7. После успешного workflow откройте production URL и отправьте тестовую заявку. Проверьте её в Supabase **Table Editor → public.leads**, после чего удалите тестовую строку. Тестируйте отдельным номером и никогда не запускайте интеграционные проверки против production базы.
+### Создание проекта и поля импорта
 
-Официальные страницы: [Next.js на Netlify](https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/), [переменные окружения Netlify Functions](https://docs.netlify.com/build/functions/environment-variables/), [подключение к PostgreSQL Supabase](https://supabase.com/docs/guides/database/connecting-to-postgres).
+1. Откройте Netlify и выберите свою Team → **Add new project → Import an existing project**.
+2. Выберите **GitHub**. Если Netlify предложит установить GitHub App, разрешите доступ к репозиторию `Alexandch/kvarta-brief` (лучше выбрать доступ только к этому репозиторию), затем выберите его в списке.
+3. Укажите параметры проекта:
+
+   | Поле | Что указать |
+   | --- | --- |
+   | Project/site name | Например, `kvarta-coffee`; имя должно быть свободно в Netlify. Оно задаёт адрес вида `kvarta-coffee.netlify.app`. |
+   | Production branch | `main` |
+   | Base directory | Оставить пустым (корень репозитория) |
+   | Package directory, если показывается | `.` или корень репозитория |
+   | Build command | `npm run build` — такое значение уже задано в `netlify.toml` |
+   | Publish directory | Оставить предложенное Netlify значение для Next.js; если поле требует ввода — `.next` |
+   | Functions directory, если показывается | Оставить автоматическую настройку |
+
+   Приложение Next.js и `package.json` находятся в корне репозитория. В проекте используется Next.js App Router и API route для отправки формы; Netlify поддерживает их своим Next.js адаптером. Не задавайте `out`: эта папка предназначена для статического экспорта, а наш сайт использует серверный API. Версия Node уже установлена как `22` в `netlify.toml`.
+
+4. Нажмите **Deploy site**. Импорт репозитория может сразу запустить первый deploy. После создания сайта выполните шаг «Остановить автоматические сборки» ниже. Если Supabase ещё не настроен, форма отправки заявок заработает после установки `DATABASE_URL` и следующего production deploy.
+
+Netlify автоматически подставляет предложенные build settings при распознавании фреймворка. Для Next.js типичны команда `next build` и папка `.next`; в репозитории команда записана как `npm run build`, которая вызывает `next build`. См. [импорт репозитория в Netlify](https://docs.netlify.com/manage/projects/add-new-project/) и [инструкцию Netlify для Next.js](https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/).
+
+### Настроить базу и публикацию
+
+1. В Netlify откройте **Project configuration → Environment variables → Add a variable** и добавьте:
+   - **Key:** `DATABASE_URL`;
+   - **Value:** полная строка подключения Supabase Transaction pooler с заменённым паролем и `sslmode=require` (см. раздел Supabase выше);
+   - **Deploy context:** `Production`;
+   - **Scopes:** `Functions`.
+
+   Не добавляйте префикс `NEXT_PUBLIC_`: строка содержит пароль и используется только серверным API. Для этого проекта достаточно scope `Functions`, потому что запрос к базе выполняется при отправке формы, а не во время сборки. Не помещайте `DATABASE_URL` в GitHub Secrets, `netlify.toml`, исходники или сообщения. Изменения переменных вступают в силу после следующего deploy. Подробности есть в [документации переменных Netlify](https://docs.netlify.com/build/environment-variables/get-started/).
+
+2. Чтобы Netlify не публиковал commit параллельно с проверками GitHub Actions, откройте **Project configuration → Developer settings → Continuous deployment → Build settings → Configure** и установите **Build status → Stopped builds**. Оставьте GitHub repository подключённым. Остановка отключает Git-triggered builds, Deploy Previews и branch deploys в Netlify; команда `netlify deploy --build --prod` из нашего GitHub Actions workflow по-прежнему может выполнить ручную публикацию. Это позволяет выкладывать production только после успешных тестов, сборки и Lighthouse. Не нажимайте **Activate builds** без необходимости: это вернёт сборки по push в Netlify. См. [Stop or activate builds](https://docs.netlify.com/build/configure-builds/stop-or-activate-builds/).
+
+3. Скопируйте **Site ID** (в новых экранах также может называться **Project ID**): **Project configuration → General → Project details → Project information → Project ID**.
+4. Создайте токен: аватар профиля → **User settings → Applications → Personal access tokens → New access token**. Назовите его, например, `kvarta-github-actions`, выберите срок действия и скопируйте значение сразу после создания.
+5. В GitHub откройте репозиторий `Alexandch/kvarta-brief` → **Settings → Secrets and variables → Actions → New repository secret** и добавьте:
+   - `NETLIFY_AUTH_TOKEN` — токен Netlify;
+   - `NETLIFY_SITE_ID` — Site/Project ID.
+
+   Это единственные Netlify credentials, нужные workflow. `DATABASE_URL` остаётся в Netlify, потому что workflow тестирует API на отдельной временной PostgreSQL.
+
+6. Следующий push в `main` запустит workflow `.github/workflows/ci.yml`: сначала unit и integration tests, typecheck, production build и Lighthouse, затем deploy job опубликует production через Netlify CLI, только если проверки прошли. До добавления обоих GitHub Secrets тесты будут выполняться, а deploy будет пропускаться.
+7. После успешной публикации откройте production URL и отправьте тестовую заявку. Проверьте её в Supabase **Table Editor → public.leads**, затем удалите тестовую строку. Используйте отдельный тестовый номер и никогда не запускайте интеграционные проверки против production базы.
+
+Site ID и Personal access token нужны Netlify CLI для адресной публикации в нужный проект; см. [Get started with Netlify CLI](https://docs.netlify.com/api-and-cli-guides/cli-guides/get-started-with-cli/). Настроенная защита `main` должна требовать статус **Tests, build, and mobile Lighthouse**.
 
 ## Тесты и CI/CD
 
