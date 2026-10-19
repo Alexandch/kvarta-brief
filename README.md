@@ -71,3 +71,8 @@ npm run dev
 - Платёжная корзина не нужна по ТЗ.
 - Этот репозиторий не содержит экспорта сессии Claude Code. Если проверяющий требует именно `/export` или скриншоты сессии, приложите реальный экспорт своего процесса разработки; история Codex не подменяется вымышленным логом.
 - Принимаются только белорусские мобильные номера `+375 25`, `29`, `33` и `44`.
+
+
+## Supabase, CI/CD, and Lighthouse
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the step-by-step Supabase and Netlify setup, test pipeline, and mobile Lighthouse report instructions.

@@ -1,10 +1,10 @@
 import { Pool } from "pg";
 import { NextResponse } from "next/server";
+import { normalizeByMobilePhone } from "@/lib/phone.mjs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const PHONE_PATTERN = /^375(?:25|29|33|44)\d{7}$/;
 const ATTRIBUTION_KEYS = [
   "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
   "gclid", "fbclid", "yclid", "landingPage", "submittedPage", "referrer",
@@ -46,11 +46,11 @@ export async function POST(request: Request) {
   const values = body as Record<string, unknown>;
   const name = typeof values.name === "string" ? values.name.trim().slice(0, 80) : "";
   const rawPhone = typeof values.phone === "string" ? values.phone : "";
-  const digits = rawPhone.replace(/\D/g, "");
+  const phone = normalizeByMobilePhone(rawPhone);
   const interest = typeof values.interest === "string" ? values.interest.trim().slice(0, 100) : "";
   const comment = typeof values.comment === "string" ? values.comment.trim().slice(0, 500) : "";
 
-  if (!PHONE_PATTERN.test(digits)) {
+  if (!phone) {
     return NextResponse.json({ error: "Введите белорусский мобильный номер в формате +375 29 123-45-67." }, { status: 422 });
   }
   if (!name) return jsonError("Укажите, как к вам обращаться.", 422);
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     const result = await getPool().query<{ lead_id: string | null; duplicate: boolean }>(
       `SELECT lead_id, duplicate
        FROM public.create_kvarta_lead($1, $2, $3, $4, $5, $6::jsonb)`,
-      [name, `+${digits}`, digits, interest, comment, JSON.stringify(attribution)],
+      [name, phone, phone.slice(1), interest, comment, JSON.stringify(attribution)],
     );
     const lead = result.rows[0];
     if (lead?.duplicate) {
