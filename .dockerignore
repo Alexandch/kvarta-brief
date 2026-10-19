@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.netlify
+.data
+.tools
+.env*
+README.md
+brief-*.png
